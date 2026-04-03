@@ -1,6 +1,6 @@
 # Automated Email Follow-Up — n8n Workflow
 
-**Built by ZERGEN Systems**
+**Built by nullvish**
 
 A plug-and-play n8n workflow that runs on a schedule, picks up new leads from a Google Sheet, generates a personalised follow-up email via Groq LLM, sends it through Gmail, marks the lead as contacted, and logs the Gmail thread ID for downstream reply tracking.
 

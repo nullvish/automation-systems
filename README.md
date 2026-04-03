@@ -1,2 +1,32 @@
 # automation-systems
-Collection of automation workflows built with n8n. Focused on real-world execution, reliability, and scalable system design.
+
+Some things are done manually. Those things are done wrong.
+
+This is a collection of production automation workflows — built to eliminate repetitive operations, handle real edge cases, and scale without adding headcount.
+
+---
+
+## Workflows
+
+| Workflow | Description |
+|---|---|
+| [Automated Email Follow-Up](./workflows/automated-email-followup/) | Picks up new leads from a sheet, generates a personalised follow-up email via LLM, sends it, and logs the thread for inbound reply tracking. Fully scheduled. Zero manual touch. |
+
+---
+
+## Structure
+
+Each workflow lives in its own folder with:
+- The export file — ready to drop into your automation platform
+- A `README.md` covering the architecture, data schema, and setup
+
+---
+
+## What you'll find here
+
+Real systems. Different stacks. Whatever the problem demands.
+
+---
+
+*nullvish*
+*Building Systems.Breaking Systems.Building Systems*

@@ -114,7 +114,7 @@ The AI Agent prompt is generic by default. Customise it inside the node to match
 ## Possible Modification
 - **Datasource** -  Xero or QuickBooks can be used as data source.
 - **LLM** - LLM selection is a crucial selections for Ai automations . However in this case any available LLM can be used , given the quality of your prompt.
-- **Sender** - Twilio based follow ups can be switched in requirement of SMS or whatsapp Based communtions . However one can use Telegram Node as well to send the messages.
+- **Sender** - Twilio or Telegram based sender node can be used as per as requirement.
 
 ---
 

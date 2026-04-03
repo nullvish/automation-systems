@@ -110,7 +110,7 @@ The trigger is set to fire at **17:20** by default. Adjust in the `Schedule Trig
 - **QuickChart** — chart generation (no API key needed)
 - **Gmail** — report delivery
 
-##Possible Modifications
+## Possible Modifications
 - **DataSource** - Xero or QuickBooks can be used
 - **LLM** - LLM focused primarily on analysis is suggested
 - **Sender** - Twilio or Telegram nodes can be used instead of Gmail

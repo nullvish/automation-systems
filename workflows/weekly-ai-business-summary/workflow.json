@@ -1,0 +1,176 @@
+{
+  "name": "Weekly AI Business Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "e36657b8-79f1-40b3-87fd-964b06577d60",
+      "name": "Pull Sheet Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [656, -80],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      },
+      "notes": "Sheet columns expected: DATE | NAME | REVENUE | SPEND"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// PURE MATH NODE — 14 DAYS, SPLIT INTO THIS WEEK & LAST WEEK\n// ============================================================\nconst items = $input.all();\nconst now = new Date();\n\n// Week boundaries\nconst thisWeekStart = new Date();\nthisWeekStart.setDate(now.getDate() - 7);\n\nconst lastWeekStart = new Date();\nlastWeekStart.setDate(now.getDate() - 14);\n\nconst lastWeekEnd = new Date(thisWeekStart);\n\n// Date normalizer\nconst normalizeDate = (raw) => {\n  const parts = String(raw).split('-');\n  return new Date(`${parts[0]}-${String(parts[1]).padStart(2,'0')}-${String(parts[2]).padStart(2,'0')}`);\n};\n\n// Split into two buckets\nconst thisWeekRows = [];\nconst lastWeekRows = [];\n\nfor (const item of items) {\n  const rowDate = normalizeDate(item.json['DATE']);\n  if (rowDate >= thisWeekStart && rowDate <= now) {\n    thisWeekRows.push(item);\n  } else if (rowDate >= lastWeekStart && rowDate < lastWeekEnd) {\n    lastWeekRows.push(item);\n  }\n}\n\n// Calculator function\nconst calcMetrics = (rows) => {\n  let totalRevenue = 0;\n  let totalSpend = 0;\n  const entries = [];\n\n  for (const row of rows) {\n    const rev = parseFloat(row.json['REVENUE']) || 0;\n    const spend = parseFloat(row.json['SPENT']) || 0;\n    totalRevenue += rev;\n    totalSpend += spend;\n    entries.push({\n      date: row.json['DATE'],\n      name: row.json['NAME'],\n      revenue: rev,\n      spend: spend\n    });\n  }\n\n  const profit = totalRevenue - totalSpend;\n  const roi = totalSpend > 0\n    ? (((totalRevenue - totalSpend) / totalSpend) * 100).toFixed(2)\n    : 'N/A (no spend recorded)';\n\n  return {\n    totalRevenue: totalRevenue.toFixed(2),\n    totalSpend: totalSpend.toFixed(2),\n    totalProfit: profit.toFixed(2),\n    roi,\n    rowCount: rows.length,\n    entries\n  };\n};\n\nconst thisWeekMetrics = calcMetrics(thisWeekRows);\nconst lastWeekMetrics = calcMetrics(lastWeekRows);\n\n// Week-over-week revenue delta\nconst revDelta = (parseFloat(thisWeekMetrics.totalRevenue) - parseFloat(lastWeekMetrics.totalRevenue)).toFixed(2);\nconst revDeltaPct = parseFloat(lastWeekMetrics.totalRevenue) > 0\n  ? (((parseFloat(thisWeekMetrics.totalRevenue) - parseFloat(lastWeekMetrics.totalRevenue)) / parseFloat(lastWeekMetrics.totalRevenue)) * 100).toFixed(2)\n  : 'N/A';\n\nreturn [{\n  json: {\n    thisWeek: {\n      dateRange: `${thisWeekStart.toISOString().split('T')[0]} to ${now.toISOString().split('T')[0]}`,\n      ...thisWeekMetrics\n    },\n    lastWeek: {\n      dateRange: `${lastWeekStart.toISOString().split('T')[0]} to ${lastWeekEnd.toISOString().split('T')[0]}`,\n      ...lastWeekMetrics\n    },\n    weekOverWeek: {\n      revenueDelta: revDelta,\n      revenueDeltaPct: `${revDeltaPct}%`\n    }\n  }\n}];"
+      },
+      "id": "99ce2c24-724d-4ff5-b7b4-4fbf7b77bbb4",
+      "name": "Calculate Metrics (Pure Math)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [816, 112],
+      "notes": "NO AI here. Raw JS arithmetic only. Revenue, Spend, ROI, Profit."
+    },
+    {
+      "parameters": {
+        "jsCode": "const lastWeek = $input.first().json.lastWeek;\nconst thisWeek = $input.first().json.thisWeek;\n\nconst chartConfig = {\n  type: \"bar\",\n  data: {\n    labels: [\"Last Week\", \"This Week\"],\n    datasets: [\n      {\n        label: \"Revenue\",\n        data: [parseFloat(lastWeek.totalRevenue), parseFloat(thisWeek.totalRevenue)],\n        backgroundColor: \"#34d399\"\n      },\n      {\n        label: \"Spend\",\n        data: [parseFloat(lastWeek.totalSpend), parseFloat(thisWeek.totalSpend)],\n        backgroundColor: \"#f87171\"\n      },\n      {\n        label: \"Profit\",\n        data: [parseFloat(lastWeek.totalProfit), parseFloat(thisWeek.totalProfit)],\n        backgroundColor: \"#a78bfa\"\n      }\n    ]\n  },\n  options: {\n    legend: { labels: { fontColor: \"#aaaaaa\" } },\n    scales: {\n      yAxes: [{ ticks: { fontColor: \"#666666\" } }],\n      xAxes: [{ ticks: { fontColor: \"#666666\" } }]\n    }\n  }\n};\n\nconst encoded = encodeURIComponent(JSON.stringify(chartConfig));\nconst chartUrl = `https://quickchart.io/chart?width=620&height=300&backgroundColor=%23111111&c=${encoded}`;\n\nreturn [{ json: { chartUrl, ...($input.first().json) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1008, -128],
+      "id": "55a878d2-a9a5-46b0-8859-6d3718386d07",
+      "name": "Build Chart URL"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.chartUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1232, 112],
+      "id": "00264195-2094-4116-9e08-6af95360b0f5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior business advisor reviewing weekly performance data with an experienced owner.\n\nYou speak as a peer — direct, surgical, and numbers-first. No hand-holding. No generic advice. No filler. Every single claim must be anchored to a specific number from the data.\n\nCONTEXT:\nThis Week: {{ $json.thisWeek.dateRange }}\nRevenue: ${{ $json.thisWeek.totalRevenue }} | Spend: ${{ $json.thisWeek.totalSpend }} | Profit: ${{ $json.thisWeek.totalProfit }} | ROI: {{ $json.thisWeek.roi }}% | Jobs: {{ $json.thisWeek.rowCount }}\n\nLast Week: {{ $json.lastWeek.dateRange }}\nRevenue: ${{ $json.lastWeek.totalRevenue }} | Spend: ${{ $json.lastWeek.totalSpend }} | Profit: ${{ $json.lastWeek.totalProfit }} | ROI: {{ $json.lastWeek.roi }}% | Jobs: {{ $json.lastWeek.rowCount }}\n\nWeek-over-Week: Revenue Delta: ${{ $json.weekOverWeek.revenueDelta }} ({{ $json.weekOverWeek.revenueDeltaPct }})\n\nJob-Level Breakdown: {{ JSON.stringify($json.thisWeek.entries, null, 2) }}\n\n---\n\nDELIVER EXACTLY THIS STRUCTURE IN CLEAN HTML:\n\n<h2>1. WEEKLY PERFORMANCE ANALYSIS</h2>\n- Calculate avg revenue per job, profit margin %, spend ratio\n- Compare each metric directly against last week with delta\n- Interpret what the movement means operationally\n- Flag if margin compression or expansion is structural or noise\n- Every sentence must contain a number\n\n<h2>2. JOB-LEVEL INTELLIGENCE</h2>\n- Name the highest revenue job with exact figures\n- Name the lowest margin job with exact figures and margin %\n- Identify any outlier (a job that breaks the pattern — high spend, zero profit, anomalous revenue)\n- Explain the operational implication of each\n\n<h2>3. SPEND EFFICIENCY AUDIT</h2>\n- Spend as % of revenue this week vs last week\n- Per-job spend ratio where data allows\n- Verdict: efficient, leaking, or borderline — with the number that makes the case\n- If leaking, identify exactly which job or pattern is the source\n\n<h2>4. RED FLAGS</h2>\nOnly include if real issues exist. Each flag must have:\n- The specific number that triggers the flag\n- Why it matters operationally\n- What it likely indicates (don't hedge — give a verdict)\nIf no real flags exist, write: <p>No critical flags this week.</p>\n\n<h2>5. ONE RECOMMENDATION</h2>\n- Derived from one specific job, ratio, or pattern in THIS data\n- Actionable within 7 days\n- Written like an operator giving orders, not a consultant giving options\n- One paragraph, no bullet points\n\n<h2>6. EXECUTIVE SUMMARY</h2>\n- 3 lines maximum\n- Line 1: Performance verdict with the headline number\n- Line 2: The one thing working\n- Line 3: The one thing that needs fixing\n\n<h2>7. CLOSING</h2>\n- One line\n- Confident, forward-facing, zero fluff\n\n---\n\nFORMATTING RULES:\n- All key figures wrapped in <strong> tags\n- Section headings use <h2>\n- Body copy uses <p>\n- No bullet points outside of where explicitly instructed\n- Output must be clean, email-ready HTML\n- Zero generic statements. Zero motivational filler. Pure signal.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "="
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [1440, -144],
+      "id": "e660203d-c389-4ae4-ba98-f8c5482256b4",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "maxTokensToSample": 1000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1504, 112],
+      "id": "5efd6f9b-5a6a-4aeb-abd6-bf0d184ffb24",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "YOUR_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_RECIPIENT_EMAILS",
+        "subject": "=Weekly Performance Report — {{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.dateRange }}",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800;900&family=Inter:wght@300;400;500&display=swap');\n\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n\n    body {\n      font-family: 'Inter', sans-serif;\n      background: #080808;\n      padding: 32px 16px;\n      color: #e0e0e0;\n    }\n\n    .wrapper { max-width: 700px; margin: 0 auto; }\n\n    .pre-header {\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      padding: 0 4px 16px;\n      border-bottom: 1px solid #1c1c1c;\n    }\n    .pre-header-left, .pre-header-right {\n      font-family: 'DM Mono', monospace;\n      font-size: 10px;\n      color: #3a3a3a;\n      letter-spacing: 2px;\n      text-transform: uppercase;\n    }\n\n    .header {\n      background: #0a0a0a;\n      border: 1px solid #1a1a1a;\n      border-bottom: none;\n      padding: 36px 40px 32px;\n      position: relative;\n      overflow: hidden;\n    }\n    .header::before {\n      content: '';\n      position: absolute;\n      top: 0; left: 0; right: 0;\n      height: 2px;\n      background: linear-gradient(90deg, transparent, #7c3aed, #a855f7, transparent);\n    }\n\n    .header-inner {\n      display: flex;\n      align-items: flex-start;\n      justify-content: space-between;\n      position: relative;\n      z-index: 1;\n    }\n    .brand-row { display: flex; align-items: center; gap: 18px; }\n    .brand-name {\n      font-family: 'Syne', sans-serif;\n      font-size: 22px; font-weight: 900;\n      color: #ffffff; letter-spacing: 6px; line-height: 1;\n    }\n    .brand-descriptor {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; color: #4a4a4a;\n      letter-spacing: 5px; margin-top: 5px;\n    }\n    .header-meta { text-align: right; position: relative; z-index: 1; }\n    .report-type {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; letter-spacing: 4px;\n      color: #7c3aed; text-transform: uppercase; margin-bottom: 6px;\n    }\n    .report-period {\n      font-family: 'DM Mono', monospace;\n      font-size: 12px; color: #555; font-weight: 500;\n    }\n    .report-period strong { color: #888; font-weight: 500; }\n\n    .metrics-strip {\n      background: #0d0d0d;\n      border: 1px solid #1a1a1a;\n      border-top: none; border-bottom: none;\n      display: grid;\n      grid-template-columns: repeat(4, 1fr);\n    }\n    .metric-cell {\n      padding: 24px 20px;\n      border-right: 1px solid #1a1a1a;\n      position: relative;\n    }\n    .metric-cell:last-child { border-right: none; }\n    .metric-index {\n      font-family: 'DM Mono', monospace;\n      font-size: 8px; color: #2a2a2a;\n      letter-spacing: 2px; margin-bottom: 10px;\n    }\n    .metric-label {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; letter-spacing: 2px;\n      color: #444; text-transform: uppercase; margin-bottom: 10px;\n    }\n    .metric-value {\n      font-family: 'Syne', sans-serif;\n      font-size: 22px; font-weight: 800;\n      line-height: 1; letter-spacing: -0.5px;\n    }\n    .metric-value.up { color: #34d399; }\n    .metric-value.down { color: #f87171; }\n    .metric-value.accent { color: #a78bfa; }\n    .metric-sub {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; color: #333; margin-top: 6px;\n    }\n\n    .wow-banner {\n      background: #0a0a0a;\n      border: 1px solid #1a1a1a;\n      border-top: none; border-bottom: none;\n      padding: 14px 40px;\n      display: flex; align-items: center; gap: 32px;\n      overflow: hidden; position: relative;\n    }\n    .wow-banner::before {\n      content: '';\n      position: absolute;\n      left: 0; top: 0; bottom: 0;\n      width: 2px;\n      background: linear-gradient(180deg, transparent, #7c3aed, transparent);\n    }\n    .wow-item { display: flex; align-items: center; gap: 10px; }\n    .wow-label {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; color: #3a3a3a;\n      letter-spacing: 2px; text-transform: uppercase;\n    }\n    .wow-value {\n      font-family: 'DM Mono', monospace;\n      font-size: 12px; font-weight: 500;\n    }\n    .wow-value.positive { color: #34d399; }\n    .wow-value.negative { color: #f87171; }\n    .wow-divider { width: 1px; height: 20px; background: #1e1e1e; }\n\n    .chart-section {\n      background: #0a0a0a;\n      border: 1px solid #1a1a1a;\n      border-top: none; border-bottom: none;\n      padding: 28px 40px;\n    }\n    .chart-eyebrow {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; letter-spacing: 4px;\n      color: #7c3aed; text-transform: uppercase;\n      margin-bottom: 16px;\n      display: flex; align-items: center; gap: 12px;\n    }\n    .chart-eyebrow::after {\n      content: '';\n      flex: 1; height: 1px;\n      background: linear-gradient(90deg, #1e1e1e, transparent);\n    }\n    .chart-img {\n      display: block;\n      width: 100%;\n      border-radius: 4px;\n      border: 1px solid #1e1e1e;\n    }\n\n    .analysis-body {\n      background: #0a0a0a;\n      border: 1px solid #1a1a1a;\n      border-top: none;\n      padding: 40px 40px 32px;\n    }\n    .section-eyebrow {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; letter-spacing: 4px;\n      color: #7c3aed; text-transform: uppercase;\n      margin-bottom: 20px;\n      display: flex; align-items: center; gap: 12px;\n    }\n    .section-eyebrow::after {\n      content: '';\n      flex: 1; height: 1px;\n      background: linear-gradient(90deg, #1e1e1e, transparent);\n    }\n    .analysis-content {\n      font-family: 'Inter', sans-serif;\n      font-size: 13.5px; line-height: 1.85;\n      color: #999; font-weight: 300;\n    }\n    .analysis-content h2 {\n      font-family: 'Syne', sans-serif;\n      font-size: 11px; font-weight: 700;\n      letter-spacing: 3px; color: #7c3aed;\n      text-transform: uppercase;\n      margin: 32px 0 12px;\n      padding-bottom: 8px;\n      border-bottom: 1px solid #161616;\n    }\n    .analysis-content h2:first-child { margin-top: 0; }\n    .analysis-content p { margin-bottom: 14px; color: #888; font-weight: 300; }\n    .analysis-content strong { color: #d4d4d4; font-weight: 500; }\n    .analysis-content p:last-child { margin-bottom: 0; }\n\n    .footer {\n      background: #070707;\n      border: 1px solid #141414;\n      border-top: none;\n      padding: 20px 40px;\n      display: flex; align-items: center; justify-content: space-between;\n    }\n    .footer-brand {\n      font-family: 'DM Mono', monospace;\n      font-size: 10px; color: #2a2a2a; letter-spacing: 2px;\n    }\n    .footer-status { display: flex; align-items: center; gap: 6px; }\n    .status-dot {\n      width: 5px; height: 5px;\n      border-radius: 50%; background: #34d399;\n    }\n    .status-text {\n      font-family: 'DM Mono', monospace;\n      font-size: 9px; color: #2a2a2a; letter-spacing: 2px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"wrapper\">\n\n    <div class=\"pre-header\">\n      <span class=\"pre-header-left\">AUTOMATED INTELLIGENCE REPORT</span>\n      <span class=\"pre-header-right\">WEEKLY // v1.0</span>\n    </div>\n\n    <div class=\"header\">\n      <div class=\"header-inner\">\n        <div class=\"brand-row\">\n          <div class=\"brand-text\">\n            <div class=\"brand-name\">YOUR COMPANY</div>\n            <div class=\"brand-descriptor\">WEEKLY PERFORMANCE REPORT</div>\n          </div>\n        </div>\n        <div class=\"header-meta\">\n          <div class=\"report-type\">Weekly Performance Report</div>\n          <div class=\"report-period\">\n            <strong>THIS WEEK</strong> &nbsp;{{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.dateRange }}\n          </div>\n          <div class=\"report-period\" style=\"margin-top:3px;\">\n            <strong>LAST WEEK</strong> &nbsp;{{ $('Calculate Metrics (Pure Math)').item.json.lastWeek.dateRange }}\n          </div>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"metrics-strip\">\n      <div class=\"metric-cell\">\n        <div class=\"metric-index\">01</div>\n        <div class=\"metric-label\">Revenue</div>\n        <div class=\"metric-value up\">${{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.totalRevenue }}</div>\n        <div class=\"metric-sub\">THIS WEEK</div>\n      </div>\n      <div class=\"metric-cell\">\n        <div class=\"metric-index\">02</div>\n        <div class=\"metric-label\">Spend</div>\n        <div class=\"metric-value down\">${{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.totalSpend }}</div>\n        <div class=\"metric-sub\">THIS WEEK</div>\n      </div>\n      <div class=\"metric-cell\">\n        <div class=\"metric-index\">03</div>\n        <div class=\"metric-label\">Net Profit</div>\n        <div class=\"metric-value up\">${{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.totalProfit }}</div>\n        <div class=\"metric-sub\">THIS WEEK</div>\n      </div>\n      <div class=\"metric-cell\">\n        <div class=\"metric-index\">04</div>\n        <div class=\"metric-label\">ROI</div>\n        <div class=\"metric-value accent\">{{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.roi }}%</div>\n        <div class=\"metric-sub\">{{ $('Calculate Metrics (Pure Math)').item.json.thisWeek.rowCount }} ENTRIES</div>\n      </div>\n    </div>\n\n    <div class=\"wow-banner\">\n      <div class=\"wow-item\">\n        <span class=\"wow-label\">WoW Revenue</span>\n        <span class=\"wow-value positive\">${{ $('Calculate Metrics (Pure Math)').item.json.weekOverWeek.revenueDelta }}</span>\n      </div>\n      <div class=\"wow-divider\"></div>\n      <div class=\"wow-item\">\n        <span class=\"wow-label\">Delta</span>\n        <span class=\"wow-value positive\">{{ $('Calculate Metrics (Pure Math)').item.json.weekOverWeek.revenueDeltaPct }}</span>\n      </div>\n      <div class=\"wow-divider\"></div>\n      <div class=\"wow-item\">\n        <span class=\"wow-label\">Last Week Revenue</span>\n        <span class=\"wow-value\" style=\"color:#666;\">${{ $('Calculate Metrics (Pure Math)').item.json.lastWeek.totalRevenue }}</span>\n      </div>\n      <div class=\"wow-divider\"></div>\n      <div class=\"wow-item\">\n        <span class=\"wow-label\">Last Week ROI</span>\n        <span class=\"wow-value\" style=\"color:#666;\">{{ $('Calculate Metrics (Pure Math)').item.json.lastWeek.roi }}%</span>\n      </div>\n    </div>\n\n    <div class=\"chart-section\">\n      <div class=\"chart-eyebrow\">PERFORMANCE CHART — WEEK OVER WEEK</div>\n      <img class=\"chart-img\" src=\"{{ $('Build Chart URL').item.json.chartUrl }}\" alt=\"Weekly Performance Chart\" />\n    </div>\n\n    <div class=\"analysis-body\">\n      <div class=\"section-eyebrow\">AI ANALYSIS</div>\n      <div class=\"analysis-content\">\n        {{ $json.text }}\n      </div>\n    </div>\n\n    <div class=\"footer\">\n      <div class=\"footer-brand\">YOUR COMPANY &nbsp;//&nbsp; AUTOMATED WEEKLY INTELLIGENCE</div>\n      <div class=\"footer-status\">\n        <div class=\"status-dot\"></div>\n        <span class=\"status-text\">DATA VERIFIED — NO AI MATH</span>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>",
+        "options": {
+          "senderName": "YOUR SENDER NAME"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [1824, -144],
+      "id": "27fae21e-c689-446b-93f6-7f343f5dba8d",
+      "name": "Send a message",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 17,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [336, 32],
+      "id": "9f6f39a5-6a28-485f-b738-cda1cc82a245",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Pull Sheet Data": {
+      "main": [[{ "node": "Calculate Metrics (Pure Math)", "type": "main", "index": 0 }]]
+    },
+    "Calculate Metrics (Pure Math)": {
+      "main": [[{ "node": "Build Chart URL", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [[{ "node": "Basic LLM Chain", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Basic LLM Chain": {
+      "main": [[{ "node": "Send a message", "type": "main", "index": 0 }]]
+    },
+    "HTTP Request": {
+      "main": [[{ "node": "Basic LLM Chain", "type": "main", "index": 0 }]]
+    },
+    "Build Chart URL": {
+      "main": [[{ "node": "HTTP Request", "type": "main", "index": 0 }]]
+    },
+    "Schedule Trigger": {
+      "main": [[{ "node": "Pull Sheet Data", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,278 @@
+{
+  "name": "Daily AI Intel Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "id": "769226c3-efaa-4aaa-a255-5850180a40d3",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-1072, 128]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads top AI news from Hacker News (AI + LLM + model leak filter)",
+        "url": "https://hnrss.org/newest?q=AI+LLM+model+leak&points=50",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [-560, 416],
+      "id": "389dd58f-16ee-4e15-b9f5-5e9790bc8eac",
+      "name": "Get HN AI News"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads AI general news from TechCrunch AI section",
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [-416, 416],
+      "id": "c2bc6e75-12c2-43bf-9ab7-18c64ba097b6",
+      "name": "Get TechCrunch AI"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads AI news and analysis from The Decoder",
+        "url": "https://the-decoder.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [-272, 432],
+      "id": "7437fb06-cfd0-4415-82cd-cfb0df1c1e30",
+      "name": "Get The Decoder"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads official OpenAI blog posts and model announcements",
+        "url": "https://openai.com/blog/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [-144, 448],
+      "id": "555a2699-8489-4163-a6c6-9af97165cb88",
+      "name": "Get OpenAI Blog"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads DeepMind research blog posts",
+        "url": "https://deepmind.google/blog/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [144, 576],
+      "id": "dcfdc65c-6ca1-48ad-b140-950e9829dfbf",
+      "name": "Get DeepMind Blog"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads HuggingFace blog: model releases, papers, and open-source AI",
+        "url": "https://huggingface.co/blog/feed.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [256, 560],
+      "id": "443f6206-7058-40f2-9adb-2e4e8a773d27",
+      "name": "Get HuggingFace Blog"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads AI chip and hardware security news from Google News",
+        "url": "https://news.google.com/rss/search?q=AI+chip+hardware+security+VLSI+NPU&hl=en-US&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [448, 480],
+      "id": "a49d8ce9-17db-4b33-988e-1dfe15d81feb",
+      "name": "Get Hardware News (GNews)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads AI automation and enterprise demand signals from Google News",
+        "url": "https://news.google.com/rss/search?q=AI+automation+enterprise+business+demand+2025&hl=en-US&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [576, 384],
+      "id": "3491562b-cfbb-4164-b246-699358249852",
+      "name": "Get Automation News (GNews)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads LLM architecture leak and model weight exposure news from Google News",
+        "url": "https://news.google.com/rss/search?q=LLM+architecture+leak+model&hl=en-US&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [688, 384],
+      "id": "497613bf-f03c-4523-9390-43cbc43d2e6b",
+      "name": "Get LLM Leak News (GNews)"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Reads SOTA model release news from Google News",
+        "url": "https://news.google.com/rss/search?q=SOTA+model+release+AI+2025&hl=en-US&gl=US&ceid=US:en",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [816, 384],
+      "id": "c1642bbc-ff85-43d5-b009-c2e826ec0ffc",
+      "name": "Get SOTA Release News (GNews)"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-816, 368],
+      "id": "92fc14a4-5449-4b41-8f98-a6d4583f26fb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI intelligence analyst. Today is {{ $today }}.\n\nCALL EVERY TOOL FIRST. Pull all sources. If any tool fails, skip it silently and continue.\n\nThen produce a Gmail-safe HTML email using EXACTLY the structure below — filled with real content from your tools.\n\nOUTPUT RULES — NON-NEGOTIABLE:\n- Return ONLY raw HTML. Start with <!DOCTYPE html>. End with </html>.\n- NO markdown. NO backticks. NO explanation before or after.\n- NO <style> tags. NO <link> tags. NO external fonts. NO CSS classes.\n- ALL styles must be written inline on every single element using the style attribute.\n- Layout is TABLE-BASED ONLY. No div, no flexbox, no grid.\n- Every <td> must have explicit: padding, font-family, font-size, color, background-color, line-height.\n\nCONTENT RULES:\n- TIER 1 (always include): model leaks, SOTA releases, architecture dumps, chip/hardware security breakthroughs\n- TIER 2 (fill remaining slots): automation demand, API changes, infra news, enterprise AI adoption\n- DROP: funding under $50M, PR fluff, repackaged press releases\n- Write with authority. No filler. No 'According to'. No 'As of today'.\n- Every source link must use the real URL from the RSS feed as the href.\n\nDESIGN TOKENS (use exactly these values inline everywhere):\n- Page bg: #080808\n- Card bg: #0d0d0d\n- Brand purple: #7b3fe4\n- Section title purple: #9b30ff\n- Light purple: #c084fc\n- Body text: #e8e8e8\n- Muted text: #555555\n- Dim text: #333333\n- Border color: #1a1a1a\n- Divider: #111111\n- Font headings: Georgia, 'Times New Roman', serif\n- Font body/mono: 'Courier New', Courier, monospace\n- Font body text: Arial, Helvetica, sans-serif\n- Hardware card top border: #5a1fa0\n- T1 tier color: #7b3fe4\n- T2 tier color: #444444\n\nOUTPUT THIS EXACT HTML SKELETON — replace every [FILL:...] with real content:\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>AI INTEL DIGEST</title></head>\n<body style=\"margin:0;padding:0;background-color:#080808;\">\n\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#080808;\">\n<tr><td align=\"center\" style=\"padding:0;background-color:#080808;\">\n\n<table width=\"680\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"max-width:680px;width:100%;background-color:#080808;\">\n\n<!-- HEADER -->\n<tr><td style=\"padding:40px 40px 32px 40px;background-color:#080808;border-bottom:1px solid #1a1a1a;\">\n  <p style=\"margin:0 0 10px 0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:4px;color:#7b3fe4;text-transform:uppercase;\">YOUR COMPANY</p>\n  <p style=\"margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:13px;letter-spacing:2px;color:#444444;\">//&nbsp;AI INTEL &mdash; DAILY DIGEST</p>\n  <p style=\"margin:0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:1px;color:#333333;\">[FILL: date like April 05 2026] &middot; AUTO-GENERATED</p>\n</td></tr>\n\n<!-- SOURCES ROW -->\n<tr><td style=\"padding:20px 40px;background-color:#080808;border-bottom:1px solid #111111;\">\n  <p style=\"margin:0 0 12px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#5a5a5a;text-transform:uppercase;\">Monitored Sources</p>\n  <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding:0;background-color:#080808;\">\n    <span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">Hacker News</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">TechCrunch AI</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">The Decoder</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">OpenAI Blog</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">DeepMind</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">HuggingFace</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">GNews: LLM Leak</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">GNews: SOTA</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">GNews: Hardware</span><span style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid #2a1a4a;color:#5a1fa0;margin-right:6px;margin-bottom:8px;\">GNews: Automation</span>\n  </td></tr></table>\n</td></tr>\n\n<!-- DIVIDER -->\n<tr><td style=\"padding:0 40px;background-color:#080808;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"1\" style=\"background-color:#2a1a4a;font-size:0;line-height:0;\">&nbsp;</td></tr></table></td></tr>\n\n<!-- SECTION 01: LEAD STORY -->\n<tr><td style=\"padding:36px 40px;background-color:#080808;border-bottom:1px solid #111111;\">\n  <p style=\"margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#5a5a5a;text-transform:uppercase;\">01 &middot; Lead Story</p>\n  <p style=\"margin:0 0 18px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:800;color:#9b30ff;line-height:1.2;letter-spacing:-0.5px;\">Headline of the Day</p>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n  <tr><td style=\"padding:20px 24px;background-color:#0d0d0d;border-left:3px solid #7b3fe4;border-top:1px solid #1c1c1c;border-right:1px solid #1c1c1c;border-bottom:1px solid #1c1c1c;\">\n    <p style=\"margin:0 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:700;color:#ffffff;line-height:1.4;\">[FILL: Single most important story title]</p>\n    <p style=\"margin:0;font-family:'Courier New',Courier,monospace;font-size:10px;color:#444444;letter-spacing:1px;\">via <a href=\"[FILL: URL]\" style=\"color:#7b3fe4;text-decoration:none;font-weight:bold;\">[FILL: Source Name]</a> &nbsp;&middot;&nbsp; [FILL: Date]</p>\n  </td></tr>\n  </table>\n</td></tr>\n\n<!-- DIVIDER -->\n<tr><td style=\"padding:0 40px;background-color:#080808;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"1\" style=\"background-color:#2a1a4a;font-size:0;line-height:0;\">&nbsp;</td></tr></table></td></tr>\n\n<!-- SECTION 02: DEEP DIVE -->\n<tr><td style=\"padding:36px 40px;background-color:#080808;border-bottom:1px solid #111111;\">\n  <p style=\"margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#5a5a5a;text-transform:uppercase;\">02 &middot; Technical Breakdown</p>\n  <p style=\"margin:0 0 18px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:800;color:#9b30ff;line-height:1.2;letter-spacing:-0.5px;\">The Deep Dive</p>\n  <p style=\"margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c0c0c0;line-height:1.85;\">[FILL: Paragraph 1 — what happened and context]</p>\n  <p style=\"margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c0c0c0;line-height:1.85;\">[FILL: Paragraph 2 — how it happened technically]</p>\n  <p style=\"margin:0 0 18px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#c0c0c0;line-height:1.85;\">[FILL: Paragraph 3 — implications and what to watch]</p>\n  <a href=\"[FILL: URL]\" style=\"display:inline-block;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#7b3fe4;text-decoration:none;border:1px solid #2a1a4a;padding:6px 14px;text-transform:uppercase;\">Read Full Story &rarr;</a>\n</td></tr>\n\n<!-- DIVIDER -->\n<tr><td style=\"padding:0 40px;background-color:#080808;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"1\" style=\"background-color:#2a1a4a;font-size:0;line-height:0;\">&nbsp;</td></tr></table></td></tr>\n\n<!-- SECTION 03: HARDWARE CORNER -->\n<tr><td style=\"padding:36px 40px;background-color:#080808;border-bottom:1px solid #111111;\">\n  <p style=\"margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#5a5a5a;text-transform:uppercase;\">03 &middot; Chip &amp; Silicon</p>\n  <p style=\"margin:0 0 18px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:800;color:#9b30ff;line-height:1.2;letter-spacing:-0.5px;\">Hardware / VLSI Corner</p>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n  <tr>\n    <td width=\"48%\" valign=\"top\" style=\"padding:18px 20px;background-color:#0a0a0a;border-top:2px solid #5a1fa0;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;\">\n      <p style=\"margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#d0d0d0;line-height:1.3;\">[FILL: HW story 1 title]</p>\n      <p style=\"margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#666666;line-height:1.6;\">[FILL: 1-2 sentence summary]</p>\n      <a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#5a1fa0;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">Source &rarr;</a>\n    </td>\n    <td width=\"4%\" style=\"padding:0;background-color:#080808;\">&nbsp;</td>\n    <td width=\"48%\" valign=\"top\" style=\"padding:18px 20px;background-color:#0a0a0a;border-top:2px solid #5a1fa0;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;\">\n      <p style=\"margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#d0d0d0;line-height:1.3;\">[FILL: HW story 2 title]</p>\n      <p style=\"margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#666666;line-height:1.6;\">[FILL: 1-2 sentence summary]</p>\n      <a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#5a1fa0;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">Source &rarr;</a>\n    </td>\n  </tr>\n  <tr><td colspan=\"3\" height=\"12\" style=\"padding:0;background-color:#080808;font-size:0;line-height:0;\">&nbsp;</td></tr>\n  <tr>\n    <td width=\"48%\" valign=\"top\" style=\"padding:18px 20px;background-color:#0a0a0a;border-top:2px solid #5a1fa0;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;\">\n      <p style=\"margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#d0d0d0;line-height:1.3;\">[FILL: HW story 3 title]</p>\n      <p style=\"margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#666666;line-height:1.6;\">[FILL: 1-2 sentence summary]</p>\n      <a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#5a1fa0;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">Source &rarr;</a>\n    </td>\n    <td width=\"4%\" style=\"padding:0;background-color:#080808;\">&nbsp;</td>\n    <td width=\"48%\" valign=\"top\" style=\"padding:18px 20px;background-color:#0a0a0a;border-top:2px solid #5a1fa0;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;\">\n      <p style=\"margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#d0d0d0;line-height:1.3;\">[FILL: HW story 4 title]</p>\n      <p style=\"margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#666666;line-height:1.6;\">[FILL: 1-2 sentence summary]</p>\n      <a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#5a1fa0;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">Source &rarr;</a>\n    </td>\n  </tr>\n  </table>\n</td></tr>\n\n<!-- DIVIDER -->\n<tr><td style=\"padding:0 40px;background-color:#080808;\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"1\" style=\"background-color:#2a1a4a;font-size:0;line-height:0;\">&nbsp;</td></tr></table></td></tr>\n\n<!-- SECTION 04: FULL FEED -->\n<tr><td style=\"padding:36px 40px;background-color:#080808;\">\n  <p style=\"margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#5a5a5a;text-transform:uppercase;\">04 &middot; Full Intel Feed</p>\n  <p style=\"margin:0 0 18px 0;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:800;color:#f0f0f0;line-height:1.2;letter-spacing:-0.5px;\">Everything Else Worth Reading</p>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#7b3fe4;text-transform:uppercase;\">T1</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T1 story 1 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#7b3fe4;text-transform:uppercase;\">T1</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T1 story 2 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#444444;text-transform:uppercase;\">T2</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T2 story 1 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#444444;text-transform:uppercase;\">T2</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T2 story 2 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#444444;text-transform:uppercase;\">T2</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T2 story 3 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-bottom:1px solid #111111;\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#444444;text-transform:uppercase;\">T2</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T2 story 4 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td width=\"60\" valign=\"top\" style=\"padding:16px 0;background-color:#080808;font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:2px;color:#444444;text-transform:uppercase;\">T2</td><td valign=\"top\" style=\"padding:16px 0;background-color:#080808;\"><p style=\"margin:0 0 4px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#e0e0e0;line-height:1.4;\">[FILL: T2 story 5 title]</p><p style=\"margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#555555;line-height:1.5;\">[FILL: 1-2 sentence summary]</p><a href=\"[FILL: URL]\" style=\"font-family:'Courier New',Courier,monospace;font-size:9px;color:#3a3a3a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;\">[FILL: Source] &rarr;</a></td></tr></table>\n</td></tr>\n\n<!-- FOOTER -->\n<tr><td style=\"padding:30px 40px;background-color:#080808;border-top:1px solid #111111;\">\n  <p style=\"margin:0 0 4px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#222222;text-transform:uppercase;\">YOUR COMPANY &middot; AI INTEL ENGINE</p>\n  <p style=\"margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#222222;\">Automated. Filtered. Delivered daily.</p>\n</td></tr>\n\n</table>\n</td></tr>\n</table>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [-704, 16],
+      "id": "0fc5665e-0d68-47e4-bd02-3007a9ded49d",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out-001",
+              "name": "htmlBody",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "out-002",
+              "name": "subject",
+              "value": "=AI INTEL — {{ $today.toFormat('MMMM dd yyyy') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-272, 16],
+      "id": "7462f1d0-0bf7-4f5e-a9d5-fa0da5584088",
+      "name": "Extract HTML Body"
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_RECIPIENT_EMAILS",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.htmlBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [-48, 16],
+      "id": "caad6f54-102b-428e-8ae4-6308979e3d8a",
+      "name": "Send via Gmail",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]]
+    },
+    "Get HN AI News": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get TechCrunch AI": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get The Decoder": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get OpenAI Blog": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get DeepMind Blog": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get HuggingFace Blog": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get Hardware News (GNews)": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get Automation News (GNews)": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get LLM Leak News (GNews)": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Get SOTA Release News (GNews)": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "AI Agent": {
+      "main": [[{ "node": "Extract HTML Body", "type": "main", "index": 0 }]]
+    },
+    "Extract HTML Body": {
+      "main": [[{ "node": "Send via Gmail", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

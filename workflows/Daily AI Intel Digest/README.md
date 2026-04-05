@@ -104,6 +104,13 @@ Default is every 3 hours. Change the interval in the `Schedule Trigger` node to 
 - **RSS Feed Tool** — native n8n node for feed ingestion
 - **Gmail** — delivery
 
+## Modifications
+
+- **News Sources** - You can modify News sources according to your own personal needs . Make it sure that the site allows web scraping , else most of the times an error will be returned
+- **HTML** - You can create your own html frontend designs . include that design into AI AGENT prompt
+- **Recipients** - Instead of Gmail , you can use Telegram or Twilio based services
+- 
+
 ---
 
 *nullvish*

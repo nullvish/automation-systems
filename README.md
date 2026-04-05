@@ -12,7 +12,7 @@ This is a collection of production automation workflows — built to eliminate r
 |---|---|
 | [Automated Email Follow-Up](./workflows/automated-email-followup/) | Picks up new leads from a sheet, generates a personalised follow-up email via LLM, sends it, and logs the thread for inbound reply tracking. Fully scheduled. Zero manual touch. |
 | [Weekly AI Business Summary](./workflows/weekly-ai-business-summary/) | Pulls weekly sheet data, computes metrics in pure JS, generates a bar chart, runs Groq analysis, and delivers a formatted HTML report via Gmail. |
-
+| [Daily AI Intel Digest](./workflows/daily-ai-intel-digest/) | Pulls from 10 RSS sources every 3 hours, filters by tier, generates a dark-themed HTML digest via GPT-4.1-mini, and delivers it via Gmail. |
 
 
 ---

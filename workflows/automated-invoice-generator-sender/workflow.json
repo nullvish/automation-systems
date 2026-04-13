@@ -1,0 +1,295 @@
+{
+  "name": "Automated Invoice Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-1488, -1216],
+      "id": "b3769d42-4bab-4078-aacb-7ad5f8cc9761",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Form Responses 1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "="
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-1184, -1216],
+      "id": "415d06ff-9759-432f-945a-26fa114f0f73",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Form Responses 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "IN PROGRESS",
+            "EMAIL": "={{ $json.EMAIL }}"
+          },
+          "matchingColumns": ["EMAIL"],
+          "schema": [
+            { "id": "Timestamp", "displayName": "Timestamp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "NAME", "displayName": "NAME", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "EMAIL", "displayName": "EMAIL", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "SERVICE", "displayName": "SERVICE", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "AMOUNT", "displayName": "AMOUNT", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "PHONE NUMBER", "displayName": "PHONE NUMBER", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "NOTES", "displayName": "NOTES", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9e8fcf7c-c492-4df3-980b-6604fe7dab6d",
+      "name": "Mark In Progress",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [-896, -1216],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "YOUR_INVOICE_TEMPLATE_DOC_ID",
+          "mode": "id"
+        },
+        "name": "=Invoice_{{ $('Get row(s) in sheet').item.json.NAME }}_{{ $now.format('yyyyMMdd') }}",
+        "options": {}
+      },
+      "id": "73c71215-1a6e-494b-a4ea-6cb03fed8fb4",
+      "name": "Copy Invoice Template",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [-672, -1216],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const docId = $json.id;\nconst sheet = $('Get row(s) in sheet').item.json;\n\nconst item = {\n  docId: docId,\n\n  name: sheet.NAME || sheet.EMAIL?.split('@')[0] || 'Client',\n  email: sheet.EMAIL || '',\n  service: sheet.SERVICE || '',\n\n  amount: new Intl.NumberFormat('en-US', {\n    minimumFractionDigits: 2,\n    maximumFractionDigits: 2\n  }).format(Number(sheet.AMOUNT || 0)),\n\n  date: new Date().toLocaleDateString('en-US', {\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric'\n  }),\n\n  invoiceNo: 'INV-' + Date.now().toString().slice(-6)\n};\n\nreturn { json: item };"
+      },
+      "id": "2ffe4e8d-4f4e-46c6-adbc-00af43972c38",
+      "name": "Build Field Map",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-384, -1216]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docId }}",
+        "actionsUi": {
+          "actionFields": [
+            { "action": "replaceAll", "text": " {{InvoiceNo}}", "replaceText": "={{ $json.invoiceNo }}" },
+            { "action": "replaceAll", "text": "{{Date}}", "replaceText": "={{ $json.date }}" },
+            { "action": "replaceAll", "text": "{{Name}}", "replaceText": "={{ $json.name }}" },
+            { "action": "replaceAll", "text": "{{Email}}", "replaceText": "={{ $json.email }}" },
+            { "action": "replaceAll", "text": "{{Service}}", "replaceText": "={{ $json.service }}" },
+            { "action": "replaceAll", "text": " {{Amount}} ", "replaceText": "={{ $json.amount }}" }
+          ]
+        }
+      },
+      "id": "aeb2ff33-79b7-4026-bc95-ccc64543e406",
+      "name": "Merge Fields into Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [0, -1216],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "YOUR_GOOGLE_DOCS_CREDENTIAL_ID",
+          "name": "Google Docs OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.documentId}}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "id": "60425672-60da-4247-931f-a82ecb3e1d19",
+      "name": "Export as PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [432, -1216],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "YOUR_GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Build Field Map').item.json.email }}",
+        "subject": "=Your Invoice — {{ $('Build Field Map').item.json.invoiceNo }}",
+        "message": "=Hi {{ $('Build Field Map').item.json.name }},\n\nPlease find your invoice attached for {{ $('Build Field Map').item.json.service }}.\n\nTotal due: ${{ $('Build Field Map').item.json.amount }}\n\nThank you for your business.\n\n— YOUR NAME",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [{}]
+          }
+        }
+      },
+      "id": "77c00df9-2879-4629-840c-ae5470cdda3c",
+      "name": "Send Invoice Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [784, -1216],
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Form Responses 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "INVOICE_SENT",
+            "Timestamp": "={{ $('Get row(s) in sheet').item.json.Timestamp }}"
+          },
+          "matchingColumns": ["Timestamp"],
+          "schema": [
+            { "id": "Timestamp", "displayName": "Timestamp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "NAME", "displayName": "NAME", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "EMAIL", "displayName": "EMAIL", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "SERVICE", "displayName": "SERVICE", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "AMOUNT", "displayName": "AMOUNT", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "PHONE NUMBER", "displayName": "PHONE NUMBER", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "NOTES", "displayName": "NOTES", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "status", "displayName": "status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f6ec3759-9174-44d4-8d86-bb7a9ff6e79b",
+      "name": "Mark Completed + Log URL",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1168, -1216],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "Get row(s) in sheet", "type": "main", "index": 0 }]]
+    },
+    "Get row(s) in sheet": {
+      "main": [[{ "node": "Mark In Progress", "type": "main", "index": 0 }]]
+    },
+    "Mark In Progress": {
+      "main": [[{ "node": "Copy Invoice Template", "type": "main", "index": 0 }]]
+    },
+    "Copy Invoice Template": {
+      "main": [[{ "node": "Build Field Map", "type": "main", "index": 0 }]]
+    },
+    "Build Field Map": {
+      "main": [[{ "node": "Merge Fields into Doc", "type": "main", "index": 0 }]]
+    },
+    "Merge Fields into Doc": {
+      "main": [[{ "node": "Export as PDF", "type": "main", "index": 0 }]]
+    },
+    "Export as PDF": {
+      "main": [[{ "node": "Send Invoice Email", "type": "main", "index": 0 }]]
+    },
+    "Send Invoice Email": {
+      "main": [[{ "node": "Mark Completed + Log URL", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

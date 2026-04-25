@@ -1,0 +1,332 @@
+{
+  "name": "LinkedIn Content Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-880, -304],
+      "id": "f8d80049-82fa-4082-bb04-9b1e08532885",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-752, 160],
+      "id": "88f911b1-80ab-4c30-b18e-613c41b3cb61",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "STATUS",
+              "lookupValue": "="
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-512, -304],
+      "id": "81c351ef-1591-4298-bc49-0699065e80af",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search for history background evolution of {{ $json.TOPIC }}\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 7,\n  \"topic\": \"general\",\n  \"time_range\": null,\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"auto_parameters\": false,\n  \"exact_match\": false,\n  \"include_usage\": false,\n  \"safe_search\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [-176, -304],
+      "id": "33af9ddf-be6c-4ece-82aa-efcbcac5d49b",
+      "name": "HISTORY"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search for how {{ $json.TOPIC }} works system structure drivers\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 7,\n  \"topic\": \"general\",\n  \"time_range\": null,\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"auto_parameters\": false,\n  \"exact_match\": false,\n  \"include_usage\": false,\n  \"safe_search\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [112, -304],
+      "id": "6ceedf62-02b3-4944-9a7c-c82666fb38c0",
+      "name": "WORKING"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search for current state key players trends of {{ $json.TOPIC }}\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 7,\n  \"topic\": \"general\",\n  \"time_range\": null,\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"auto_parameters\": false,\n  \"exact_match\": false,\n  \"include_usage\": false,\n  \"safe_search\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [320, -304],
+      "id": "a85acc7d-3005-4599-b43c-6b83f0065dc3",
+      "name": "CURRENT"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search for opportunities risks challenges in {{ $json.TOPIC }}\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 7,\n  \"topic\": \"general\",\n  \"time_range\": null,\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"auto_parameters\": false,\n  \"exact_match\": false,\n  \"include_usage\": false,\n  \"safe_search\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [560, -304],
+      "id": "27b3ec27-3a86-4bc3-9775-07c0378b2cf1",
+      "name": "OPPORTUNITY"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search for future trends predictions insights on {{ $json.TOPIC }}\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 7,\n  \"topic\": \"general\",\n  \"time_range\": null,\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"auto_parameters\": false,\n  \"exact_match\": false,\n  \"include_usage\": false,\n  \"safe_search\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [784, -304],
+      "id": "2ac9c432-24e8-4e35-b344-72461dad53d8",
+      "name": "FUTURE"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=TOPIC -{{ $('Get row(s) in sheet').item.json.TOPIC }}\n1. Origins & Context (origins_context)\nDefinition + background + history\nWhy it exists, how it started, what shaped it early\nArticle1-{{ $('HISTORY').item.json.results[0].content }}\nArticle2-{{ $('HISTORY').item.json.results[1].content }}\nArticle3-{{ $('HISTORY').item.json.results[2].content }}\nArticle4-{{ $('HISTORY').item.json.results[3].content }}\nArticle5-{{ $('HISTORY').item.json.results[4].content }}\n\n2. Current Landscape (current_landscape)\nPresent state + key players + structure\nWhat's actually happening right now (not theory)\nArticle1-{{ $('CURRENT').item.json.results[0].content }}\nArticle2-{{ $('CURRENT').item.json.results[1].content }}\nArticle3-{{ $('CURRENT').item.json.results[2].content }}\nArticle4-{{ $('CURRENT').item.json.results[3].content }}\nArticle5-{{ $('CURRENT').item.json.results[4].content }}\n\n3. Underlying Mechanics (mechanics)\nHow it works internally\nKey drivers, systems, incentives, power dynamics\nArticle1-{{ $('WORKING').item.json.results[0].content }}\nArticle2-{{ $('WORKING').item.json.results[1].content }}\nArticle3-{{ $('WORKING').item.json.results[2].content }}\nArticle4-{{ $('WORKING').item.json.results[3].content }}\nArticle5-{{ $('WORKING').item.json.results[4].content }}\n\n4. Opportunities & Risks (opportunities_risks)\nWhere the leverage is\nWhat can be exploited vs what can collapse\nArticle1-{{ $('OPPORTUNITY').item.json.results[0].content }}\nArticle2-{{ $('OPPORTUNITY').item.json.results[1].content }}\nArticle3-{{ $('OPPORTUNITY').item.json.results[2].content }}\nArticle4-{{ $('OPPORTUNITY').item.json.results[3].content }}\nArticle5-{{ $('OPPORTUNITY').item.json.results[4].content }}\n\n5. Future & Strategic Insight (future_insight)\nTrends + trajectory + contrarian view\nWhat most people miss + what to do about it\nArticle1-{{ $json.results[0].content }}\nArticle2-{{ $json.results[1].content }}\nArticle3-{{ $json.results[2].content }}\nArticle4-{{ $json.results[3].content }}\nArticle5-{{ $json.results[4].content }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a ghostwriter for people who think for a living.\n\nYour single job: take raw research and produce a LinkedIn post that reads like it was written by someone who has operated at the highest level of their field — and has the restraint to say only what matters.\n\n---\n\nVOICE\n\nYou are not a summarizer. You are not a motivator.\nYou are an analyst with taste.\n\nWrite like someone who has seen how systems actually work — the incentives, the failures, the things nobody says in the meeting but everyone knows.\n\nSharp. Controlled. Occasionally cold.\nNever dramatic. Never inspirational. Never vague. Can use emojis in a controlled way.\n\nIf a sentence does not add a specific idea, cut it.\n\n---\n\nNEGATIVE EXAMPLES — NEVER WRITE LIKE THIS\n\n\"As we stand at the threshold of a new era...\"\n\"The future belongs to those who...\"\n\"It's crucial that we navigate...\"\n\"In a rapidly evolving landscape...\"\n\"This is a game-changer.\"\n\nThese phrases are the sound of someone with nothing to say.\n\n---\n\nSTRUCTURE — FOLLOW THIS EXACTLY\n\n1. OPENING LINE\nOne sentence. No warmup. Drop the reader into a tension, a contradiction, or a fact that reframes everything that follows.\n\n2. THE CLAIM\nOne line. This is your thesis. Make it arguable. Make it specific. Make it something a reasonable person could disagree with.\n\n3. THE EVIDENCE\n3 to 5 lines. Each one a discrete, specific idea. No filler between them. Use line breaks, not connectors.\nFormat: plain lines or bullet points. Choose based on which makes the ideas hit harder.\n\n4. THE INVERSION\nOne short paragraph. Take the obvious interpretation of your claim and show why it's incomplete, backwards, or missing the real mechanism. This is where you earn authority.\n\n5. THE CLOSE\nOne sentence. Not a question. Not a call to action. A conclusion that feels inevitable given everything above — like the period at the end of an argument that doesn't need your agreement to be true.\n\n---\n\nEMOJI RULES\n\nUse emojis in moderation.\n\n---\n\nFORMATTING\n\nLine breaks between every section.\nNo headers. No labels. No \"Hook:\" or \"Insight:\" visible in the output.\nThe structure should be felt, not seen.\n\n---\n\nSOURCE MATERIAL RULE\n\nBefore writing, identify the single most non-obvious thing the research implies. Build the entire post around that.\nIf you cannot identify one, the research is insufficient — compress and flag it.\nIf the research is insufficient, use the topic and the given information to extrapolate.\n\nOUTPUT: The post. Nothing else. No explanation. No preamble.\nAt the end use relatable hashtags.\nJust the post."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [1072, -304],
+      "id": "5911dd67-48df-4f32-9cc6-7c84ef0261e2",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [1104, -80],
+      "id": "7b6b70db-7cac-4863-b3cf-1f678ca43d3b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TOPIC": "={{ $('Get row(s) in sheet').item.json.TOPIC }}",
+            "STATUS": "CONTENT_MADE",
+            "CONTENT": "={{ $json.text }}"
+          },
+          "matchingColumns": ["TOPIC"],
+          "schema": [
+            { "id": "TOPIC", "displayName": "TOPIC", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "STATUS", "displayName": "STATUS", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "CONTENT", "displayName": "CONTENT", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1600, -304],
+      "id": "499835d9-a3cd-47f5-b5cd-f088ef17a13e",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=Your Daily Post —\n{{ $json.CONTENT }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1808, -304],
+      "id": "3877a2a8-d70b-4f35-8bba-6868209559b3",
+      "name": "Send a text message",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [[{ "node": "Get row(s) in sheet", "type": "main", "index": 0 }]]
+    },
+    "Schedule Trigger": {
+      "main": [[{ "node": "Get row(s) in sheet", "type": "main", "index": 0 }]]
+    },
+    "Get row(s) in sheet": {
+      "main": [[{ "node": "HISTORY", "type": "main", "index": 0 }]]
+    },
+    "HISTORY": {
+      "main": [[{ "node": "WORKING", "type": "main", "index": 0 }]]
+    },
+    "WORKING": {
+      "main": [[{ "node": "CURRENT", "type": "main", "index": 0 }]]
+    },
+    "CURRENT": {
+      "main": [[{ "node": "OPPORTUNITY", "type": "main", "index": 0 }]]
+    },
+    "OPPORTUNITY": {
+      "main": [[{ "node": "FUTURE", "type": "main", "index": 0 }]]
+    },
+    "FUTURE": {
+      "main": [[{ "node": "Basic LLM Chain", "type": "main", "index": 0 }]]
+    },
+    "Basic LLM Chain": {
+      "main": [[{ "node": "Append or update row in sheet", "type": "main", "index": 0 }]]
+    },
+    "Append or update row in sheet": {
+      "main": [[{ "node": "Send a text message", "type": "main", "index": 0 }]]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [[{ "node": "Basic LLM Chain", "type": "ai_languageModel", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

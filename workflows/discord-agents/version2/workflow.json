@@ -1,0 +1,263 @@
+{
+  "name": "Julius Memory Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "503ce7c5-8013-491a-974c-89aa549b6f30",
+      "name": "Chat Message",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [0, 416]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Incoming message:\n{{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the gatekeeper that decides whether the assistant named Julius should reply to an incoming chat message. Output JSON only: {\"respond\": true|false, \"reason\": \"...\"}.\n\nRULES (in priority order)\n\n1. DIRECT MENTION - ALWAYS RESPOND. If the message explicitly mentions Julius by name, tags Julius, or directly addresses Julius, set respond=true. This has the highest priority. Never reject a message clearly directed at Julius.\n\n2. DIRECT REPLY - RESPOND. If the user is replying to one of Julius's previous messages, respond when their message is directed at Julius or continues the conversation with it.\n\n3. RELEVANT CONVERSATION - USE JUDGMENT. If Julius is not mentioned, decide whether it should participate. Consider whether: the message asks a question Julius can meaningfully answer; it requests help, information, an explanation or an opinion; it clearly continues a conversation involving Julius; Julius can add meaningful value without interrupting the conversation.\n\n4. NORMAL HUMAN CONVERSATION - DO NOT RESPOND. If users are chatting among themselves, joking, greeting each other, discussing personal matters, or having a conversation that does not involve Julius, set respond=false.\n\n5. NO FORCED PARTICIPATION. Do not respond merely because a message contains a question, an interesting topic, or something Julius knows about. A question directed at another person is not automatically an invitation for Julius.\n\n6. AMBIGUOUS MESSAGES. If it is unclear whether Julius should participate, choose respond=false. Never choose silence when rule 1 applies.\n\nCONTEXT: Messages arrive one at a time. Use any recent conversation history provided to judge who is speaking to whom, whether Julius is already part of the conversation, whether the message continues a previous exchange, and whether it is meant for another user. Do not assume every message is intended for Julius."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "2380fd5f-681c-44c1-b2ff-e10b2068ee26",
+      "name": "Should Julius Reply",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [224, 416]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "5dc7f2e3-c729-45d7-999d-db5e7fe6542b",
+      "name": "Decision Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [192, 640]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{ \"respond\": true, \"reason\": \"short explanation\" }"
+      },
+      "id": "0a4f1211-1491-4f31-a11a-6e3051433be6",
+      "name": "Decision Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [432, 640]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "respond-true",
+              "leftValue": "={{ $json.output.respond }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a7410c56-07f6-4812-9e4f-aed1f6bac851",
+      "name": "Respond?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [576, 416]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Chat Message').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "Your name is Julius. You are an assistant with a long-term memory. You reply to the user message. When the user asks about something from earlier, call search_memory and answer from the results; if nothing relevant is found, say so. When the user shares a durable fact or preference, or you produce a useful conclusion worth keeping, call save_memory with a clear self-contained note. Do not save small talk or plain questions. Briefly mention when you saved something."
+        }
+      },
+      "id": "a2e8b6fc-766d-4b88-b1e7-f4dc80af9bd8",
+      "name": "Memory Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [944, 0]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "0abb810e-2b4f-4409-9d0f-229815c0a938",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [880, 224]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the long-term memory of previously stored user messages. Use it to recall facts, notes, or earlier information the user shared.",
+        "tableName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "documents"
+        },
+        "topK": 5,
+        "options": {}
+      },
+      "id": "7148f05f-952d-4744-a85f-7c6bacc6c18f",
+      "name": "search_memory",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [1152, 288]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "718a71c0-ed3a-48af-b21b-dd028449da0c",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [1168, 496]
+    },
+    {
+      "parameters": {
+        "description": "Save an important fact, preference, or piece of information into long-term memory (Supabase vector store). Call this ONLY when something is worth remembering later, such as user facts, preferences, decisions, or your own useful conclusions. Do not save small talk or plain questions.",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_SAVE_MEMORY_WORKFLOW_ID"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "memory": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('memory', 'The self-contained fact or note to remember, written as a clear statement') }}",
+            "session_id": "={{ $('Chat Message').item.json.sessionId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "memory",
+              "displayName": "memory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "b2b9e8f0-4aef-4689-9cc5-154740ee4a04",
+      "name": "save_memory",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1408, 224]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "silent-output",
+              "name": "output",
+              "value": "=(Julius stayed silent: {{ $json.output.reason }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "29e200c9-229f-43db-92c0-c09c0a17a12e",
+      "name": "Stay Silent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [1008, 608]
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [960, 368],
+      "id": "42e465a4-4bfa-4304-879f-467c9f6d6f7c",
+      "name": "Postgres Chat Memory"
+    }
+  ],
+  "connections": {
+    "Chat Message": {
+      "main": [[{ "node": "Should Julius Reply", "type": "main", "index": 0 }]]
+    },
+    "Should Julius Reply": {
+      "main": [[{ "node": "Respond?", "type": "main", "index": 0 }]]
+    },
+    "Decision Model": {
+      "ai_languageModel": [[{ "node": "Should Julius Reply", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Decision Parser": {
+      "ai_outputParser": [[{ "node": "Should Julius Reply", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "Respond?": {
+      "main": [
+        [{ "node": "Memory Agent", "type": "main", "index": 0 }],
+        [{ "node": "Stay Silent", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [[{ "node": "Memory Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "search_memory": {
+      "ai_tool": [[{ "node": "Memory Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [[{ "node": "search_memory", "type": "ai_embedding", "index": 0 }]]
+    },
+    "save_memory": {
+      "ai_tool": [[{ "node": "Memory Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [[{ "node": "Memory Agent", "type": "ai_memory", "index": 0 }]]
+    }
+  },
+  "pinData": {}
+}

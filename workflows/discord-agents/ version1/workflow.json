@@ -1,0 +1,95 @@
+{
+  "name": "Save Memory to Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            { "name": "memory" },
+            { "name": "session_id" }
+          ]
+        }
+      },
+      "id": "a811eb4e-8493-4fe2-b425-2bf7218d74c4",
+      "name": "Save Memory Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 112]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "documents"
+        },
+        "options": {}
+      },
+      "id": "19746346-5503-4231-95c3-2d7123cf76df",
+      "name": "Store Memory in Supabase",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [224, 112]
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.memory }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "session_id",
+                "value": "={{ $json.session_id }}"
+              },
+              {
+                "name": "stored_at",
+                "value": "={{ $now.toISO() }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "c9afd9ee-4855-4e89-aaec-45ab71035e89",
+      "name": "Memory Document",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [368, 336]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "43800f09-fbc3-4d8f-b48f-97d2bf612c26",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [272, 320]
+    }
+  ],
+  "connections": {
+    "Save Memory Input": {
+      "main": [
+        [
+          { "node": "Store Memory in Supabase", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Memory Document": {
+      "ai_document": [
+        [
+          { "node": "Store Memory in Supabase", "type": "ai_document", "index": 0 }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          { "node": "Store Memory in Supabase", "type": "ai_embedding", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
